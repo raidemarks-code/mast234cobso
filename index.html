@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#080d19"><title>Master System Arcade</title>
+<style>
+:root{color-scheme:dark;font-family:Segoe UI,Arial,sans-serif}*{box-sizing:border-box}
+body{margin:0;background:#080d19;color:#eef4ff}
+header{padding:22px max(20px,4vw);background:linear-gradient(110deg,#10264a,#14162e);border-bottom:2px solid #16baf7;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+h1{margin:0;color:#6be2ff;font-size:clamp(24px,3vw,36px)}header p{margin:5px 0;color:#a9c0d9}.top-tag{color:#a9c0d9;font-size:13px}
+.layout{display:grid;grid-template-columns:220px minmax(0,1fr);min-height:calc(100vh - 100px)}
+aside{padding:20px;background:#10192b;border-right:1px solid #293c5b}aside h2{font-size:16px;margin:0 0 18px}
+.categorias{display:block}.categoria{display:block;width:100%;border:0;border-radius:9px;text-align:left;padding:12px;margin:6px 0;background:#1b2a43;color:#e8f4ff;cursor:pointer}
+.categoria:hover,.categoria.ativa{background:#116a9e}main{padding:25px;min-width:0}
+.topo{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:22px}
+input{padding:12px 14px;width:min(100%,340px);background:#131f32;color:white;border:1px solid #355579;border-radius:10px}
+.grade{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:20px}
+.card{background:#14233a;border:1px solid #29466b;border-radius:14px;overflow:hidden;cursor:pointer;text-align:left;color:white;padding:0;transition:transform .15s,border-color .15s}
+.card:hover,.card:focus-visible{transform:translateY(-3px);border-color:#4bcaff}
+.capa{height:160px;width:100%;object-fit:cover;display:block;background:#172b48}
+.sem-capa{height:160px;display:grid;place-items:center;background:linear-gradient(135deg,#123e65,#261849);font-size:54px}
+.info{padding:13px}.info strong{display:block;font-size:17px;margin-bottom:6px}.info small{color:#93b8da}
+.play{display:inline-block;margin-top:12px;color:#5bdbff;font-weight:bold}.nota{color:#a6bdd7;line-height:1.6;font-size:14px}
+@media(max-width:700px){.layout{display:block}aside{border-right:0;border-bottom:1px solid #293c5b;padding:14px}.categorias{display:flex;overflow:auto;gap:8px}.categoria{white-space:nowrap;width:auto;flex:0 0 auto}main{padding:16px}.grade{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px}.capa,.sem-capa{height:125px}}
+</style></head>
+<body>
+<header><div><h1>MASTER SYSTEM ARCADE</h1><p>Biblioteca visual de jogos Sega Master System</p></div><span class="top-tag">ROM .SMS + .BIN</span></header>
+<div class="layout"><aside><h2>CATEGORIAS</h2><nav id="categorias" class="categorias" aria-label="Categorias"></nav></aside>
+<main><div class="topo"><h2 id="cabecalho">Todos os jogos</h2><input id="busca" placeholder="Pesquisar jogo..." aria-label="Pesquisar jogo"></div>
+<div id="grade" class="grade"></div><p id="mensagem" class="nota"></p>
+<p class="nota">Adicione suas ROMs e capas na pasta <b>jogos/</b> e cadastre os caminhos no arquivo <b>jogos.json</b>. O emulador é carregado pela internet.</p></main></div>
+<script>
+let jogos=[],categoriaAtual='Todos';const $=id=>document.getElementById(id);const texto=s=>String(s||'');
+function caminhoSeguro(s){return typeof s==='string'&&s.startsWith('jogos/')&&!s.split('/').includes('..')&&!s.includes('\\')&&!s.includes('?')&&!s.includes('#')}
+function categorias(){const nomes=['Todos',...new Set(jogos.map(j=>j.categoria||'Outros'))];$('categorias').replaceChildren();nomes.forEach(nome=>{const b=document.createElement('button');b.className='categoria'+(categoriaAtual===nome?' ativa':'');b.textContent=(nome==='Todos'?'🕹️ ':'📁 ')+nome;b.onclick=()=>{categoriaAtual=nome;categorias();render()};$('categorias').append(b)})}
+function render(){const termo=$('busca').value.trim().toLocaleLowerCase('pt-BR');$('cabecalho').textContent=categoriaAtual==='Todos'?'Todos os jogos':categoriaAtual;$('grade').replaceChildren();const lista=jogos.filter(j=>(categoriaAtual==='Todos'||(j.categoria||'Outros')===categoriaAtual)&&texto(j.nome).toLocaleLowerCase('pt-BR').includes(termo));lista.forEach(j=>{const b=document.createElement('button');b.className='card';const capa=document.createElement('div');capa.className='sem-capa';capa.textContent='🎮';if(caminhoSeguro(j.imagem)&&/\.(png|jpe?g|webp)$/i.test(j.imagem)){const img=document.createElement('img');img.className='capa';img.alt='Capa de '+j.nome;img.loading='lazy';img.src=j.imagem;img.onerror=()=>img.replaceWith(capa);b.append(img)}else b.append(capa);const info=document.createElement('div');info.className='info';const nome=document.createElement('strong');nome.textContent=j.nome;const cat=document.createElement('small');cat.textContent=(j.categoria||'Outros')+' • '+j.arquivo.split('.').pop().toUpperCase();const play=document.createElement('div');play.className='play';play.textContent='JOGAR';info.append(nome,cat,play);b.append(info);b.onclick=()=>{location.href='player.html?rom='+encodeURIComponent(j.arquivo)+'&nome='+encodeURIComponent(j.nome)};$('grade').append(b)});$('mensagem').textContent=lista.length?'':'Nenhum jogo encontrado.'}
+$('busca').oninput=render;
+(async()=>{try{const r=await fetch('jogos.json',{cache:'no-store'});if(!r.ok)throw Error('HTTP '+r.status);const dados=await r.json();if(!Array.isArray(dados))throw Error('jogos.json precisa conter uma lista');jogos=dados.filter(j=>j&&typeof j.nome==='string'&&caminhoSeguro(j.arquivo)&&/\.(sms|bin)$/i.test(j.arquivo));categorias();render();if(!jogos.length)$('mensagem').textContent='Nenhum jogo cadastrado em jogos.json.'}catch(e){$('mensagem').textContent='Não foi possível carregar jogos.json. Abra pelo servidor HTTP/HTTPS. Detalhes: '+e.message;categorias()}})();
+</script></body></html>

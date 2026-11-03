@@ -1,0 +1,20 @@
+[
+  {
+    "nome": "Master System 1",
+    "categoria": "Aventura",
+    "arquivo": "jogos/aventura/AlexKiddMiracle.sms",
+    "imagem": "jogos/aventura/AlexKiddMiracle.png"
+  },
+  {
+    "nome": "Exemplo Master System 2",
+    "categoria": "Ação",
+    "arquivo": "jogos/acao/exemplo.bin",
+    "imagem": "jogos/acao/exemplo.png"
+  },
+  {
+    "nome": "Exemplo Master System 3",
+    "categoria": "Corrida",
+    "arquivo": "jogos/corrida/exemplo.sms",
+    "imagem": "jogos/corrida/exemplo.jpg"
+  }
+]
