@@ -1,0 +1,20 @@
+const jogos = [
+  {
+    "nome": "mastersystem1",
+    "categoria": "aventura",
+    "arquivo": "jogos/aventura/alexkiddmiracle.sms",
+    "imagem": "jogos/aventura/alexkiddmiracle.png"
+  },
+  {
+    "nome": "mastersystem1",
+    "categoria": "acao",
+    "arquivo": "jogos/acao/alexkiddmiracle.sms",
+    "imagem": "jogos/acao/alexkiddmiracle.png"
+  },
+  {
+    "nome": "mastersystem222",
+    "categoria": "corrida",
+    "arquivo": "jogos/corrida/alexkiddmiracle.sms",
+    "imagem": "jogos/corrida/alexkiddmiracle.png"
+  }
+];
