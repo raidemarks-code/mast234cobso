@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"><meta name="theme-color" content="#080d19"><title>Master System Arcade — Jogar</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:#080d19;color:#eef4ff;font-family:Segoe UI,Arial,sans-serif}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:12px 16px;background:#10192b;border-bottom:1px solid #29466b}
+h1{font-size:20px;margin:0;color:#6be2ff}.btn{border:0;border-radius:9px;padding:10px 14px;background:#0b83ba;color:white;font-weight:600;cursor:pointer}
+main{padding:12px;max-width:1100px;margin:auto}.aviso{color:#a6bdd7;font-size:13px;line-height:1.5}
+#game{width:100%;height:min(76vh,760px);min-height:360px;background:#000;border:1px solid #355579;border-radius:10px;overflow:hidden}
+#game canvas,#game iframe{max-width:100%}.erro{padding:20px;color:#ffcf8a}
+body:fullscreen{background:#000}body:fullscreen header{display:none}body:fullscreen main{max-width:none;padding:0}body:fullscreen #game{height:100vh;min-height:100vh;border:0;border-radius:0}
+@media(max-width:600px){header{padding:10px}h1{font-size:17px}main{padding:8px}#game{height:70vh;min-height:300px}.aviso{font-size:12px}}
+</style></head><body>
+<header><h1 id="titulo">MASTER SYSTEM ARCADE</h1><button class="btn" onclick="location.href='index.html'">VOLTAR À BIBLIOTECA</button></header>
+<main><div id="game"></div><p class="aviso">No celular, o EmulatorJS oferece controles virtuais de toque. Use a opção de tela cheia do emulador para ampliar o jogo. Salvar e carregar dependem das opções do emulador e do armazenamento do navegador.</p><p id="erro" class="erro"></p></main>
+<script>
+const p=new URLSearchParams(location.search),rom=p.get('rom')||'',nome=p.get('nome')||'Jogo Master System';
+const seguro=rom.startsWith('jogos/')&&!rom.split('/').includes('..')&&!rom.includes('\\')&&!rom.includes('?')&&!rom.includes('#')&&/\.(sms|bin)$/i.test(rom);
+document.getElementById('titulo').textContent='MASTER SYSTEM ARCADE — '+nome;
+if(!seguro){document.getElementById('erro').textContent='Caminho da ROM inválido. Volte à biblioteca e selecione um jogo cadastrado.'}
+else{
+ window.EJS_player='#game';window.EJS_core='segaMS';window.EJS_gameUrl=new URL(rom,location.href).href;window.EJS_gameName=nome;
+ window.EJS_pathtodata='https://cdn.emulatorjs.org/stable/data/';window.EJS_controlScheme='segaMS';window.EJS_browserMode='';window.EJS_startOnLoaded=true;window.EJS_volume=0.5;
+ window.EJS_Buttons={playPause:true,restart:true,fullscreen:true,saveState:true,loadState:true,quickSave:true,quickLoad:true,volume:true,gamepad:true,exitEmulation:true};
+ const s=document.createElement('script');s.src=window.EJS_pathtodata+'loader.js';s.onerror=()=>document.getElementById('erro').textContent='Não foi possível carregar o EmulatorJS. Confira sua conexão com a internet.';document.body.appendChild(s);
+}
+</script></body></html>
