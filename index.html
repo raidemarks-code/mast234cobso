@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
@@ -12,10 +12,10 @@ header{padding:22px max(20px,4vw);background:linear-gradient(110deg,#10264a,#141
 h1{margin:0;color:#6be2ff;font-size:clamp(20px,3vw,36px)}header p{margin:5px 0;color:#a9c0d9}.top-tag{color:#a9c0d9;font-size:13px}
 .layout{display:grid;grid-template-columns:220px minmax(0,1fr);min-height:calc(100vh - 100px)}
 aside{padding:20px;background:#10192b;border-right:1px solid #293c5b}aside h2{font-size:16px;margin:0 0 18px}
-.categorias{display:block}.categoria{display:block;width:100%;border:0;border-radius:9px;text-align:left;padding:12px;margin:6px 0;background:#1b2a43;color:#e8f4ff;cursor:pointer}
+.categorias{display:block}.categoria{display:block;width:100%;border:0;border-radius:9px;text-align:left;padding:12px;margin:6px 0;background:#1b2a43;color:#e8f4ff;cursor:pointer;font-size:15px}
 .categoria:hover,.categoria.ativa{background:#116a9e}main{padding:25px;min-width:0}
 .topo{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:22px}
-input{padding:12px 14px;width:min(100%,340px);background:#131f32;color:white;border:1px solid #355579;border-radius:10px}
+input{padding:12px 14px;width:min(100%,340px);background:#131f32;color:white;border:1px solid #355579;border-radius:10px;font-size:16px}
 .grade{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:20px}
 .card{background:#14233a;border:1px solid #29466b;border-radius:14px;overflow:hidden;cursor:pointer;text-align:left;color:white;padding:0;transition:transform .15s,border-color .15s}
 .card:hover,.card:focus-visible{transform:translateY(-3px);border-color:#4bcaff}
@@ -23,11 +23,15 @@ input{padding:12px 14px;width:min(100%,340px);background:#131f32;color:white;bor
 .sem-capa{height:160px;display:grid;place-items:center;background:linear-gradient(135deg,#123e65,#261849);font-size:54px}
 .info{padding:13px}.info strong{display:block;font-size:17px;margin-bottom:6px}.info small{color:#93b8da}
 .play{display:inline-block;margin-top:12px;color:#5bdbff;font-weight:bold}.nota{color:#a6bdd7;line-height:1.6;font-size:14px}
-.btn{border:0;border-radius:9px;padding:10px 14px;background:#0b83ba;color:white;font-weight:600;cursor:pointer}
-.botoes{display:flex;gap:8px;flex-wrap:wrap}
-#game{width:100%;height:min(76vh,760px);height:min(76dvh,760px);min-height:320px;background:#000;border:1px solid #355579;border-radius:10px;overflow:hidden;margin-bottom:12px}
-#game iframe{width:100%;height:100%;border:0;display:block}
-.erro{padding:12px 0;color:#ffcf8a;line-height:1.5;word-break:break-all}
+.btn{border:0;border-radius:9px;padding:12px 16px;background:#0b83ba;color:white;font-weight:700;cursor:pointer;font-size:15px}
+#view-player{display:none;height:100vh;height:100dvh;flex-direction:column;background:#000}
+#barra{display:flex;gap:10px;align-items:center;padding:8px 10px;background:#10192b;border-bottom:1px solid #293c5b}
+#barra span{font-weight:700;color:#6be2ff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+#game{flex:1;min-height:0;width:100%;background:#000;position:relative}
+#status{padding:10px 12px;color:#ffcf8a;font-size:14px;line-height:1.5;word-break:break-word;background:#10192b;max-height:30vh;overflow:auto}
+#status:empty{display:none}
+body.modo-player header,body.modo-player #view-biblioteca{display:none}
+body.modo-player #view-player{display:flex}
 @media(max-width:700px){.layout{display:block}aside{border-right:0;border-bottom:1px solid #293c5b;padding:14px}.categorias{display:flex;overflow:auto;gap:8px}.categoria{white-space:nowrap;width:auto;flex:0 0 auto}main{padding:16px}.grade{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px}.capa,.sem-capa{height:125px}}
 </style>
 </head>
@@ -35,14 +39,10 @@ input{padding:12px 14px;width:min(100%,340px);background:#131f32;color:white;bor
 
 <header>
   <div>
-    <h1 id="titulo-header">MASTER SYSTEM ARCADE</h1>
-    <p id="subtitulo-header">Biblioteca visual de jogos Sega Master System</p>
+    <h1>MASTER SYSTEM ARCADE</h1>
+    <p>Biblioteca visual de jogos Sega Master System</p>
   </div>
-  <span class="top-tag" id="tag-header">ROM .SMS + .BIN</span>
-  <div class="botoes">
-    <button id="btn-tela" class="btn" style="display:none;" onclick="telaCheia()">TELA CHEIA</button>
-    <button id="btn-voltar" class="btn" style="display:none;" onclick="fecharEmulador()">VOLTAR À BIBLIOTECA</button>
-  </div>
+  <span class="top-tag">ROM .SMS + .BIN</span>
 </header>
 
 <div id="view-biblioteca" class="layout">
@@ -60,12 +60,14 @@ input{padding:12px 14px;width:min(100%,340px);background:#131f32;color:white;bor
   </main>
 </div>
 
-<div id="view-player" style="display:none;">
-  <main style="max-width:1100px;margin:auto;padding:12px;">
-    <div id="game"></div>
-    <p class="nota">Toque no botão de play dentro do emulador para iniciar. No celular os controles de toque aparecem sozinhos.</p>
-    <p id="erro" class="erro"></p>
-  </main>
+<div id="view-player">
+  <div id="barra">
+    <button class="btn" onclick="voltar()">← VOLTAR</button>
+    <span id="titulo-jogo"></span>
+    <button class="btn" onclick="telaCheia()">TELA CHEIA</button>
+  </div>
+  <div id="game"></div>
+  <div id="status"></div>
 </div>
 
 <script>
@@ -73,8 +75,8 @@ const dadosJogos = [
   {
     "nome": "mastersystem1",
     "categoria": "aventura",
-    "arquivo": "alexkiddmiracle.sms",
-    "imagem": "alexkiddmiracle.png"
+    "arquivo": "jogos/aventura/alexkiddmiracle.sms",
+    "imagem": "jogos/aventura/alexkiddmiracle.png"
   },
   {
     "nome": "mastersystem1",
@@ -90,13 +92,11 @@ const dadosJogos = [
   }
 ];
 
-let jogos = [], categoriaAtual = 'Todos';
+let jogos = dadosJogos, categoriaAtual = 'Todos';
 const $ = id => document.getElementById(id);
 const texto = s => String(s || '');
-
-function obterUrlAbsoluta(caminho) {
-  return new URL(encodeURI(caminho), window.location.href).href;
-}
+const urlAbs = c => new URL(encodeURI(c), window.location.href).href;
+const status = m => { $('status').textContent = m; };
 
 function categorias() {
   const nomes = ['Todos', ...new Set(jogos.map(j => j.categoria || 'Outros'))];
@@ -122,18 +122,15 @@ function render() {
     const capa = document.createElement('div');
     capa.className = 'sem-capa';
     capa.textContent = '🎮';
-
     if (j.imagem && /\.(png|jpe?g|webp)$/i.test(j.imagem)) {
       const img = document.createElement('img');
       img.className = 'capa';
       img.alt = 'Capa de ' + j.nome;
       img.loading = 'lazy';
-      img.src = obterUrlAbsoluta(j.imagem);
+      img.src = urlAbs(j.imagem);
       img.onerror = () => img.replaceWith(capa);
       b.append(img);
-    } else {
-      b.append(capa);
-    }
+    } else b.append(capa);
 
     const info = document.createElement('div');
     info.className = 'info';
@@ -147,94 +144,85 @@ function render() {
     info.append(nome, cat, play);
     b.append(info);
 
-    b.onclick = () => abrirEmulador(j.arquivo, j.nome);
+    // Abre o jogo em uma página nova e limpa (melhor para celular)
+    b.onclick = () => {
+      location.href = location.pathname + '?rom=' + encodeURIComponent(j.arquivo) + '&nome=' + encodeURIComponent(j.nome);
+    };
     $('grade').append(b);
   });
-
   $('mensagem').textContent = lista.length ? '' : 'Nenhum jogo encontrado.';
 }
 
-function montarEmulador(url, nome) {
-  const seguro = v => JSON.stringify(v).replace(/</g, '\\u003c');
-  const srcdoc =
-    '<!doctype html><html><head><meta charset="utf-8">' +
-    '<meta name="viewport" content="width=device-width,initial-scale=1">' +
-    '<style>html,body{margin:0;height:100%;background:#000;overflow:hidden}#game{width:100%;height:100%}</style>' +
-    '</head><body><div id="game"></div>' +
-    '<script>' +
-    'EJS_player="#game";' +
-    'EJS_core="segaMS";' +
-    'EJS_gameUrl=' + seguro(url) + ';' +
-    'EJS_gameName=' + seguro(nome) + ';' +
-    'EJS_pathtodata="https://cdn.emulatorjs.org/stable/data/";' +
-    'EJS_startOnLoaded=false;' +
-    'EJS_volume=0.5;' +
-    '<\/script>' +
-    '<script src="https://cdn.emulatorjs.org/stable/data/loader.js"><\/script>' +
-    '</body></html>';
-
-  const f = document.createElement('iframe');
-  f.id = 'ejs-frame';
-  f.setAttribute('allow', 'fullscreen; autoplay; gamepad');
-  f.setAttribute('allowfullscreen', '');
-  f.srcdoc = srcdoc;
-  $('game').innerHTML = '';
-  $('game').append(f);
-}
-
-function abrirEmulador(rom, nome) {
-  $('view-biblioteca').style.display = 'none';
-  $('subtitulo-header').style.display = 'none';
-  $('tag-header').style.display = 'none';
-  $('btn-voltar').style.display = 'block';
-  $('btn-tela').style.display = 'block';
-  $('view-player').style.display = 'block';
-  $('titulo-header').textContent = 'MASTER SYSTEM ARCADE — ' + nome;
-  $('game').innerHTML = '';
-  $('erro').textContent = '';
-  window.scrollTo(0, 0);
-
-  const url = obterUrlAbsoluta(rom);
-
-  // Confere se a ROM existe (GitHub Pages diferencia maiúscula de minúscula)
-  fetch(url, { method: 'HEAD', cache: 'no-store' })
-    .then(r => {
-      if (r.status === 404) {
-        $('erro').textContent = 'ROM não encontrada (erro 404): ' + url +
-          ' — confira se o nome e a pasta no GitHub estão IGUAIS ao do código, incluindo maiúsculas/minúsculas e a extensão.';
-        return;
-      }
-      montarEmulador(url, nome);
-    })
-    .catch(() => montarEmulador(url, nome));
-}
+function voltar() { location.href = location.pathname; }
 
 function telaCheia() {
-  const f = $('ejs-frame') || $('game');
-  const fn = f.requestFullscreen || f.webkitRequestFullscreen;
-  if (fn) fn.call(f);
-  else $('erro').textContent = 'Seu navegador não permite tela cheia aqui. Use o botão de tela cheia dentro do emulador.';
+  const el = document.documentElement;
+  const fn = el.requestFullscreen || el.webkitRequestFullscreen;
+  if (fn) { try { fn.call(el); } catch (e) {} }
 }
 
-function fecharEmulador() {
-  if (document.fullscreenElement) document.exitFullscreen();
-  $('view-player').style.display = 'none';
-  $('btn-voltar').style.display = 'none';
-  $('btn-tela').style.display = 'none';
-  $('subtitulo-header').style.display = 'block';
-  $('tag-header').style.display = 'inline';
-  $('view-biblioteca').style.display = 'grid';
-  $('titulo-header').textContent = 'MASTER SYSTEM ARCADE';
-  $('game').innerHTML = '';
-  $('erro').textContent = '';
+async function iniciarPlayer(rom, nome) {
+  document.body.classList.add('modo-player');
+  $('titulo-jogo').textContent = nome;
+  document.title = nome + ' - Master System Arcade';
+  const url = urlAbs(rom);
+
+  status('Verificando ROM...');
+  try {
+    const r = await fetch(url, { cache: 'no-store' });
+    if (!r.ok) {
+      status('ROM não encontrada (erro ' + r.status + '): ' + url +
+        '\nConfira se o nome e a pasta no GitHub estão IGUAIS ao código (maiúsculas, minúsculas e extensão).');
+      return;
+    }
+    const buf = await r.arrayBuffer();
+    if (buf.byteLength < 1024) {
+      status('O arquivo da ROM veio vazio ou muito pequeno (' + buf.byteLength + ' bytes). Reenvie a ROM para o GitHub.');
+      return;
+    }
+  } catch (e) {
+    status('Não foi possível baixar a ROM: ' + e.message);
+    return;
+  }
+
+  status('Carregando emulador...');
+  window.EJS_player = '#game';
+  window.EJS_core = 'segaMS';
+  window.EJS_gameUrl = url;
+  window.EJS_gameName = nome;
+  window.EJS_pathtodata = 'https://cdn.emulatorjs.org/stable/data/';
+  window.EJS_startOnLoaded = false;   // mostra o botão de play (necessário para o som no celular)
+  window.EJS_volume = 0.5;
+  window.EJS_threads = false;
+  window.EJS_ready = () => status('');
+  window.EJS_onGameStart = () => status('');
+
+  const s = document.createElement('script');
+  s.src = window.EJS_pathtodata + 'loader.js';
+  s.onerror = () => status('Não foi possível carregar o emulador (cdn.emulatorjs.org). Verifique sua internet ou se algum bloqueador de anúncios/DNS está bloqueando.');
+  document.body.appendChild(s);
+
+  setTimeout(() => {
+    if ($('status').textContent === 'Carregando emulador...') {
+      status('O emulador está demorando. Aguarde mais um pouco; se não aparecer o botão de play, atualize a página e tente de novo.');
+    }
+  }, 15000);
 }
+
+window.addEventListener('error', e => {
+  if (document.body.classList.contains('modo-player')) status('Erro: ' + e.message);
+});
 
 $('busca').oninput = render;
 
 (function init() {
-  jogos = dadosJogos;
-  categorias();
-  render();
+  const p = new URLSearchParams(location.search);
+  if (p.get('rom')) {
+    iniciarPlayer(p.get('rom'), p.get('nome') || 'Jogo');
+  } else {
+    categorias();
+    render();
+  }
 })();
 </script>
 </body>
