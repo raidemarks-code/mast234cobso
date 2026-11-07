@@ -12,7 +12,7 @@ header{padding:22px max(20px,4vw);background:linear-gradient(110deg,#10264a,#141
 h1{margin:0;color:#6be2ff;font-size:clamp(24px,3vw,36px)}header p{margin:5px 0;color:#a9c0d9}.top-tag{color:#a9c0d9;font-size:13px}
 .layout{display:grid;grid-template-columns:220px minmax(0,1fr);min-height:calc(100vh - 100px)}
 aside{padding:20px;background:#10192b;border-right:1px solid #293c5b}aside h2{font-size:16px;margin:0 0 18px}
-.categorias{display:block}.categoria{display:block;width:100%;border:0;border-radius:99px;text-align:left;padding:12px;margin:6px 0;background:#1b2a43;color:#e8f4ff;cursor:pointer}
+.categorias{display:block}.categoria{display:block;width:100%;border:0;border-radius:9px;text-align:left;padding:12px;margin:6px 0;background:#1b2a43;color:#e8f4ff;cursor:pointer}
 .categoria:hover,.categoria.ativa{background:#116a9e}main{padding:25px;min-width:0}
 .topo{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:22px}
 input{padding:12px 14px;width:min(100%,340px);background:#131f32;color:white;border:1px solid #355579;border-radius:10px}
@@ -25,7 +25,6 @@ input{padding:12px 14px;width:min(100%,340px);background:#131f32;color:white;bor
 .play{display:inline-block;margin-top:12px;color:#5bdbff;font-weight:bold}.nota{color:#a6bdd7;line-height:1.6;font-size:14px}
 @media(max-width:700px){.layout{display:block}aside{border-right:0;border-bottom:1px solid #293c5b;padding:14px}.categorias{display:flex;overflow:auto;gap:8px}.categoria{white-space:nowrap;width:auto;flex:0 0 auto}main{padding:16px}.grade{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px}.capa,.sem-capa{height:125px}}
 
-/* Estilos adicionados para a tela do emulador */
 .btn{border:0;border-radius:9px;padding:10px 14px;background:#0b83ba;color:white;font-weight:600;cursor:pointer}
 #game{width:100%;height:min(76vh,760px);min-height:360px;background:#000;border:1px solid #355579;border-radius:10px;overflow:hidden;margin-bottom:12px}
 #game canvas,#game iframe{max-width:100%}
@@ -44,7 +43,6 @@ body:fullscreen{background:#000}body:fullscreen header{display:none}body:fullscr
   <button id="btn-voltar" class="btn" style="display:none;" onclick="fecharEmulador()">VOLTAR À BIBLIOTECA</button>
 </header>
 
-<!-- VIEW: BIBLIOTECA -->
 <div id="view-biblioteca" class="layout">
   <aside>
     <h2>CATEGORIAS</h2>
@@ -57,21 +55,18 @@ body:fullscreen{background:#000}body:fullscreen header{display:none}body:fullscr
     </div>
     <div id="grade" class="grade"></div>
     <p id="mensagem" class="nota"></p>
-    <p class="nota">Adicione suas ROMs e capas na pasta <b>jogos/</b>. O emulador é carregado pela internet.</p>
   </main>
 </div>
 
-<!-- VIEW: EMULADOR (PLAYER) -->
 <div id="view-player" style="display:none;">
   <main style="max-width:1100px;margin:auto;padding:12px;">
     <div id="game"></div>
-    <p class="aviso nota">No celular, o EmulatorJS oferece controles virtuais de toque. Use a opção de tela cheia do emulador para ampliar o jogo. Salvar e carregar dependem das opções do emulador e do armazenamento do navegador.</p>
+    <p class="aviso nota">No celular, o EmulatorJS oferece controles virtuais de toque. Use a opção de tela cheia do emulador para ampliar o jogo.</p>
     <p id="erro" class="erro"></p>
   </main>
 </div>
 
 <script>
-// Dados do jogos.json embutidos diretamente no script
 const dadosJogos = [
   {
     "nome": "mastersystem1",
@@ -97,8 +92,9 @@ let jogos = [], categoriaAtual = 'Todos';
 const $ = id => document.getElementById(id);
 const texto = s => String(s || '');
 
-function caminhoSeguro(s) {
-  return typeof s === 'string' && s.startsWith('jogos/') && !s.split('/').includes('..') && !s.includes('\\') && !s.includes('?') && !s.includes('#');
+// Converte caminho relativo em URL absoluta no GitHub Pages
+function obterUrlAbsoluta(caminho) {
+  return new URL(caminho, window.location.href).href;
 }
 
 function categorias() {
@@ -125,17 +121,19 @@ function render() {
     const capa = document.createElement('div');
     capa.className = 'sem-capa';
     capa.textContent = '🎮';
-    if (caminhoSeguro(j.imagem) && /\.(png|jpe?g|webp)$/i.test(j.imagem)) {
+    
+    if (j.imagem && /\.(png|jpe?g|webp)$/i.test(j.imagem)) {
       const img = document.createElement('img');
       img.className = 'capa';
       img.alt = 'Capa de ' + j.nome;
       img.loading = 'lazy';
-      img.src = j.imagem;
+      img.src = obterUrlAbsoluta(j.imagem);
       img.onerror = () => img.replaceWith(capa);
       b.append(img);
     } else {
       b.append(capa);
     }
+    
     const info = document.createElement('div');
     info.className = 'info';
     const nome = document.createElement('strong');
@@ -148,7 +146,6 @@ function render() {
     info.append(nome, cat, play);
     b.append(info);
     
-    // Ao clicar, abre o emulador na mesma página
     b.onclick = () => { abrirEmulador(j.arquivo, j.nome); };
     $('grade').append(b);
   });
@@ -167,27 +164,33 @@ function abrirEmulador(rom, nome) {
   $('game').innerHTML = '';
   $('erro').textContent = '';
 
-  const seguro = rom.startsWith('jogos/') && !rom.split('/').includes('..') && !rom.includes('\\') && !rom.includes('?') && !rom.includes('#') && /\.(sms|bin)$/i.test(rom);
-
-  if (!seguro) {
-    $('erro').textContent = 'Caminho da ROM inválido. Volte à biblioteca e selecione um jogo cadastrado.';
-    return;
-  }
-
+  // Configurações do EmulatorJS otimizadas para processamento mobile
   window.EJS_player = '#game';
   window.EJS_core = 'segaMS';
-  window.EJS_gameUrl = new URL(rom, location.href).href;
+  window.EJS_gameUrl = obterUrlAbsoluta(rom);
   window.EJS_gameName = nome;
   window.EJS_pathtodata = 'https://cdn.emulatorjs.org/stable/data/';
   window.EJS_controlScheme = 'segaMS';
-  window.EJS_browserMode = '';
   window.EJS_startOnLoaded = true;
   window.EJS_volume = 0.5;
-  window.EJS_Buttons = {playPause:true, restart:true, fullscreen:true, saveState:true, loadState:true, quickSave:true, quickLoad:true, volume:true, gamepad:true, exitEmulation:true};
+  
+  // Ajustes de desempenho para diminuir travamentos de áudio
+  window.EJS_threads = false; 
+  window.EJS_colorDepth = 16; 
+  
+  window.EJS_Buttons = {
+    playPause: true, restart: true, fullscreen: true, 
+    saveState: true, loadState: true, quickSave: true, 
+    quickLoad: true, volume: true, gamepad: true, exitEmulation: false
+  };
+
+  const scriptAntigo = document.getElementById('ejs-script');
+  if (scriptAntigo) scriptAntigo.remove();
 
   const s = document.createElement('script');
+  s.id = 'ejs-script';
   s.src = window.EJS_pathtodata + 'loader.js';
-  s.onerror = () => $('erro').textContent = 'Não foi possível carregar o EmulatorJS. Confira sua conexão com a internet.';
+  s.onerror = () => $('erro').textContent = 'Não foi possível carregar o emulador. Verifique sua conexão.';
   document.body.appendChild(s);
 }
 
@@ -198,17 +201,15 @@ function fecharEmulador() {
   $('tag-header').style.display = 'inline';
   $('view-biblioteca').style.display = 'grid';
   $('titulo-header').textContent = 'MASTER SYSTEM ARCADE';
-  $('game').innerHTML = ''; // Limpa o container do emulador
+  $('game').innerHTML = '';
 }
 
-// Inicialização da biblioteca
 $('busca').oninput = render;
 
 (function init() {
-  jogos = dadosJogos.filter(j => j && typeof j.nome === 'string' && caminhoSeguro(j.arquivo) && /\.(sms|bin)$/i.test(j.arquivo));
+  jogos = dadosJogos;
   categorias();
   render();
-  if (!jogos.length) $('mensagem').textContent = 'Nenhum jogo cadastrado.';
 })();
 </script>
 </body>
